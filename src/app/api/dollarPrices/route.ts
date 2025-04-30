@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { NextResponse } from 'next/server.js';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   const client = new MongoClient(process.env.MONGODB_URI!);
@@ -13,6 +13,7 @@ export async function GET() {
                       .toArray();
     return NextResponse.json(data);
   } catch (error) {
+    console.error("Error en /api/dollarPrices:", error);
     return NextResponse.json(
       { error: "Error al obtener datos" },
       { status: 500 }

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, IconButton } from "@mui/material";
 import { Close } from "@mui/icons-material";
+import Image from "next/image";
 
 const WhatsAppBanner = () => {
   const [visible, setVisible] = useState(true);
@@ -34,10 +35,12 @@ const WhatsAppBanner = () => {
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center" }}>
-        <img
+        <Image
           src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
           alt="WhatsApp Logo"
           style={{ width: 30, height: 30, marginRight: 10 }}
+          width={30}
+          height={30}
         />
         <Typography variant="body1">
           <a
