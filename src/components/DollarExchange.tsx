@@ -11,12 +11,14 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import Image from "next/image";
 
 interface ExchangeService {
   name: string;
-  compra: number;
-  venta: number;
+  buy: number;
+  sell: number;
   url: string;
+  logo: string;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -44,7 +46,7 @@ function DollarExchange() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/exchangeServices');
+        const response = await fetch("/api/exchangeServices");
         const data = await response.json();
         setServices(data);
       } catch (error) {
@@ -54,6 +56,13 @@ function DollarExchange() {
     fetchData();
   }, []);
 
+  // Crear grupos de 3 servicios
+  const chunkSize = 3;
+  const serviceChunks = [];
+  for (let i = 0; i < services.length; i += chunkSize) {
+    serviceChunks.push(services.slice(i, i + chunkSize));
+  }
+
   return (
     <TableContainer component={Paper}>
       <Typography variant="h6" sx={{ padding: "16px" }}>
@@ -61,26 +70,59 @@ function DollarExchange() {
       </Typography>
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
+          {/* Encabezado se mantiene igual */}
           <TableRow>
-            <StyledTableCell>Entidad Financiera</StyledTableCell>
-            <StyledTableCell align="right">Acción</StyledTableCell>
+            <StyledTableCell>Revisa quien está cambiando</StyledTableCell>
+        
+            <StyledTableCell align="right">Compra</StyledTableCell>
+            <StyledTableCell align="right">Venta</StyledTableCell>
+            {/* Repetir para 3 columnas */}
+            <StyledTableCell></StyledTableCell>
+            
+            <StyledTableCell align="right">Compra</StyledTableCell>
+            <StyledTableCell align="right">Venta</StyledTableCell>
+            <StyledTableCell></StyledTableCell>
+    
             <StyledTableCell align="right">Compra</StyledTableCell>
             <StyledTableCell align="right">Venta</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {services.map((service) => (
-            <StyledTableRow key={service.name}>
-              <StyledTableCell component="th" scope="row">
-                {service.name}
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                <Button variant="contained" href={service.url}>
-                  CAMBIAR
-                </Button>
-              </StyledTableCell>
-              <StyledTableCell align="right">{service.compra}</StyledTableCell>
-              <StyledTableCell align="right">{service.venta}</StyledTableCell>
+          {serviceChunks.map((chunk, index) => (
+            <StyledTableRow key={index}>
+              {[...Array(3)].map((_, position) => {
+                const service = chunk[position];
+                return service ? (
+                  <React.Fragment key={service.name}>
+                    <StyledTableCell component="th" scope="row" sx={{display: "flex", gap: "20px"}}>
+                      <Image
+                        width={85}
+                        height={30}
+                        src={service.logo}
+                        alt={service.name}
+                      ></Image>
+                       <Button variant="contained" href={service.url}>
+                        CAMBIAR
+                      </Button>
+                    </StyledTableCell>
+                   
+                    <StyledTableCell align="right">
+                      {service.buy}
+                    </StyledTableCell>
+                    <StyledTableCell align="right">
+                      {service.sell}
+                    </StyledTableCell>
+                  </React.Fragment>
+                ) : (
+                  // Celdas vacías para mantener el diseño
+                  <React.Fragment key={position}>
+                    <StyledTableCell component="th" scope="row" />
+                    <StyledTableCell align="right" />
+                    <StyledTableCell align="right" />
+                  
+                  </React.Fragment>
+                );
+              })}
             </StyledTableRow>
           ))}
         </TableBody>

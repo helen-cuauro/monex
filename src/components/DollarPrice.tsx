@@ -15,9 +15,9 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 
 interface DollarPrice {
-  entidad: string;
-  compra: number;
-  venta: number;
+  entity: string;
+  buy: number;
+  sell: number;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -70,16 +70,16 @@ export default function DollarPrice() {
         </TableHead>
         <TableBody>
           {prices.map((price) => (
-            <StyledTableRow key={price.entidad}>
+            <StyledTableRow key={price.entity}>
               <StyledTableCell component="th" scope="row">
                 <Box display="flex" alignItems="center" gap={1}>
-                  {price.entidad === "Sunat" && <GavelIcon />}
-                  {price.entidad === "Paralelo" && <CurrencyExchangeIcon />}
-                  <Typography>{price.entidad}</Typography>
+                  {price.entity === "Sunat" && <GavelIcon />}
+                  {price.entity === "Paralelo" && <CurrencyExchangeIcon />}
+                  <Typography>{price.entity}</Typography>
                 </Box>
               </StyledTableCell>
-              <StyledTableCell align="right">{price.compra}</StyledTableCell>
-              <StyledTableCell align="right">{price.venta}</StyledTableCell>
+              <StyledTableCell align="right">{price.buy}</StyledTableCell>
+              <StyledTableCell align="right">{price.sell}</StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>

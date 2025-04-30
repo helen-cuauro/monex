@@ -6,7 +6,7 @@ export async function GET() {
   
   try {
     await client.connect();
-    const db = client.db("cambio_online");
+    const db = client.db("currency_exchange");
     const data = await db.collection("exchange_services")
                       .find({})
                       .sort({ name: 1 })
