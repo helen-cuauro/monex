@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -12,6 +13,12 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import GavelIcon from "@mui/icons-material/Gavel";
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+
+interface DollarPrice {
+  entidad: string;
+  compra: number;
+  venta: number;
+}
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -32,16 +39,22 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function createData(entidad: string, compra: number, venta: number) {
-  return { entidad, compra, venta };
-}
-
-const rows = [
-  createData("Sunat", 3.725, 3.752),
-  createData("Paralelo", 3.725, 3.752),
-];
-
 export default function DollarPrice() {
+  const [prices, setPrices] = useState<DollarPrice[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/dollarPrices');
+        const data = await response.json();
+        setPrices(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <TableContainer component={Paper}>
       <Typography variant="h6" sx={{ padding: "16px" }}>
@@ -56,17 +69,17 @@ export default function DollarPrice() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow key={row.entidad}>
+          {prices.map((price) => (
+            <StyledTableRow key={price.entidad}>
               <StyledTableCell component="th" scope="row">
                 <Box display="flex" alignItems="center" gap={1}>
-                  {row.entidad === "Sunat" && <GavelIcon />}
-                  {row.entidad === "Paralelo" && <CurrencyExchangeIcon />}
-                  <Typography>{row.entidad}</Typography>
+                  {price.entidad === "Sunat" && <GavelIcon />}
+                  {price.entidad === "Paralelo" && <CurrencyExchangeIcon />}
+                  <Typography>{price.entidad}</Typography>
                 </Box>
               </StyledTableCell>
-              <StyledTableCell align="right">{row.compra}</StyledTableCell>
-              <StyledTableCell align="right">{row.venta}</StyledTableCell>
+              <StyledTableCell align="right">{price.compra}</StyledTableCell>
+              <StyledTableCell align="right">{price.venta}</StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>

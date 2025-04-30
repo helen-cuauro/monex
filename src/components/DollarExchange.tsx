@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -10,6 +11,13 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+
+interface ExchangeService {
+  name: string;
+  compra: number;
+  venta: number;
+  url: string;
+}
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -30,23 +38,22 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function createData(
-  name: string,
-  button: string,
-  compra: number,
-  venta: number,
-  url: string
-) {
-  return { name, button, compra, venta, url };
-}
+function DollarExchange() {
+  const [services, setServices] = useState<ExchangeService[]>([]);
 
-const rows = [
-  createData("Western Union", "CAMBIAR", 3.725, 3.752, "/western-union"),
-  createData("Cambia Fx", "CAMBIAR", 3.725, 3.752, "/cambia-fx"),
-  createData("DichiKASH", "CAMBIAR", 3.725, 3.752, "/dichikash"),
-];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/exchangeServices');
+        const data = await response.json();
+        setServices(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
-export default function DollarExchange() {
   return (
     <TableContainer component={Paper}>
       <Typography variant="h6" sx={{ padding: "16px" }}>
@@ -55,25 +62,25 @@ export default function DollarExchange() {
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell></StyledTableCell>
-            <StyledTableCell align="right"></StyledTableCell>
+            <StyledTableCell>Entidad Financiera</StyledTableCell>
+            <StyledTableCell align="right">Acción</StyledTableCell>
             <StyledTableCell align="right">Compra</StyledTableCell>
             <StyledTableCell align="right">Venta</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow key={row.name}>
+          {services.map((service) => (
+            <StyledTableRow key={service.name}>
               <StyledTableCell component="th" scope="row">
-                {row.name}
+                {service.name}
               </StyledTableCell>
               <StyledTableCell align="right">
-                <Button variant="contained" component="a" href={row.url}>
-                  {row.button}
+                <Button variant="contained" href={service.url}>
+                  CAMBIAR
                 </Button>
               </StyledTableCell>
-              <StyledTableCell align="right">{row.compra}</StyledTableCell>
-              <StyledTableCell align="right">{row.venta}</StyledTableCell>
+              <StyledTableCell align="right">{service.compra}</StyledTableCell>
+              <StyledTableCell align="right">{service.venta}</StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>
@@ -81,3 +88,5 @@ export default function DollarExchange() {
     </TableContainer>
   );
 }
+
+export default DollarExchange;
