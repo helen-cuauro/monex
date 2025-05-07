@@ -6,10 +6,9 @@ export async function GET() {
   
   try {
     await client.connect();
-    const db = client.db("currency_exchange");
+    const db = client.db("cambio_online");
     const data = await db.collection("exchange_services")
                       .find({})
-                      .sort({ name: 1 })
                       .toArray();
     return NextResponse.json(data);
   } catch (error) {

@@ -107,10 +107,10 @@ function DollarExchange() {
                     </StyledTableCell>
                    
                     <StyledTableCell align="right">
-                      {service.buy}
+                    {service.buy.toFixed(3)}
                     </StyledTableCell>
                     <StyledTableCell align="right">
-                      {service.sell}
+                      {service.sell.toFixed(3)}
                     </StyledTableCell>
                   </React.Fragment>
                 ) : (
