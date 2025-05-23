@@ -42,19 +42,27 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 function DollarExchange() {
   const [services, setServices] = useState<ExchangeService[]>([]);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/exchangeServices");
-        const data = await response.json();
-        setServices(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+        const res = await fetch("/api/exchangeServices");
+        const data = await res.json();
+
+        if (!lastUpdate || new Date(data.updatedAt) > new Date(lastUpdate)) {
+          setServices(data.services);
+          setLastUpdate(new Date(data.updatedAt));
+        }
+      } catch (error) {}
     };
+
     fetchData();
-  }, []);
+
+    const interval = setInterval(fetchData, 60000); // Cada 60 segundos
+
+    return () => clearInterval(interval);
+  }, [lastUpdate]);
 
   // Crear grupos de 3 servicios
   const chunkSize = 3;
@@ -73,16 +81,16 @@ function DollarExchange() {
           {/* Encabezado se mantiene igual */}
           <TableRow>
             <StyledTableCell>Revisa quien está cambiando</StyledTableCell>
-        
+
             <StyledTableCell align="right">Compra</StyledTableCell>
             <StyledTableCell align="right">Venta</StyledTableCell>
             {/* Repetir para 3 columnas */}
             <StyledTableCell></StyledTableCell>
-            
+
             <StyledTableCell align="right">Compra</StyledTableCell>
             <StyledTableCell align="right">Venta</StyledTableCell>
             <StyledTableCell></StyledTableCell>
-    
+
             <StyledTableCell align="right">Compra</StyledTableCell>
             <StyledTableCell align="right">Venta</StyledTableCell>
           </TableRow>
@@ -94,20 +102,24 @@ function DollarExchange() {
                 const service = chunk[position];
                 return service ? (
                   <React.Fragment key={service.name}>
-                    <StyledTableCell component="th" scope="row" sx={{display: "flex", gap: "20px"}}>
+                    <StyledTableCell
+                      component="th"
+                      scope="row"
+                      sx={{ display: "flex", gap: "20px" }}
+                    >
                       <Image
                         width={85}
                         height={30}
                         src={service.logo}
                         alt={service.name}
                       ></Image>
-                       <Button variant="contained" href={service.url}>
+                      <Button variant="contained" href={service.url}>
                         CAMBIAR
                       </Button>
                     </StyledTableCell>
-                   
+
                     <StyledTableCell align="right">
-                    {service.buy.toFixed(3)}
+                      {service.buy.toFixed(3)}
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       {service.sell.toFixed(3)}
@@ -119,7 +131,6 @@ function DollarExchange() {
                     <StyledTableCell component="th" scope="row" />
                     <StyledTableCell align="right" />
                     <StyledTableCell align="right" />
-                  
                   </React.Fragment>
                 );
               })}

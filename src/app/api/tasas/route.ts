@@ -64,6 +64,7 @@ export async function GET() {
     const db = mongoClient.db("cambio_online");
     const collection = db.collection("exchange_services");
 
+    const now = new Date();
     for (const casa of casasDeCambio) {
       const existingCasa = await collection.findOne({ name: casa.name });
 
@@ -77,13 +78,14 @@ export async function GET() {
                 sell: casa.sell,
                 logo: casa.logo,
                 url: casa.url,
+                updatedAt: now,
               },
             }
           );
           console.log(`✅ Actualizado: ${casa.name}`);
         }
       } else {
-        await collection.insertOne(casa);
+        await collection.insertOne({...casa,  updatedAt: now });
         console.log(`✅ Insertado nuevo: ${casa.name}`);
       }
     }
