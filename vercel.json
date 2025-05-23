@@ -1,9 +1,8 @@
 {
-    "cron": [
-      {
-        "path": "/api/tasas",
-        "schedule": "*/1 * * * *"
-      }
-    ]
-  }
-  
+  "crons": [
+    {
+      "path": "/api/tasas",
+      "schedule": "*/1 * * * *"
+    }
+  ]
+}
