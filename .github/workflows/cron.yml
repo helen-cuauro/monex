@@ -3,6 +3,7 @@ name: Call API every minute
 on:
   schedule:
     - cron: '* * * * *'
+  workflow_dispatch:   
 
 jobs:
   call-api:
