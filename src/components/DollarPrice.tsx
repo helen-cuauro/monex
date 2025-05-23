@@ -11,9 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import GavelIcon from "@mui/icons-material/Gavel";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
-import Image from "next/image";
 
 interface DollarPrice {
   entity: string;
