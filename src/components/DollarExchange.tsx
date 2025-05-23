@@ -54,7 +54,9 @@ function DollarExchange() {
           setServices(data.services);
           setLastUpdate(new Date(data.updatedAt));
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     fetchData();
