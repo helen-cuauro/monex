@@ -108,8 +108,8 @@ export async function GET() {
   }
 }
 
-// Programar la ejecución periódica cada 5 minutos
-cron.schedule("*/5 * * * *", async () => {
+// Programar la ejecución periódica cada 1 minutos
+cron.schedule("*/1 * * * *", async () => {
   console.log("Ejecutando actualización de casas de cambio...");
   await GET();
 });
