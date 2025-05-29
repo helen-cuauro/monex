@@ -6,8 +6,8 @@ import Container from "@mui/material/Container";
 export default function Home() {
   return (
     <div>
+      <WhatsAppBanner />
       <Container maxWidth="lg">
-        <WhatsAppBanner />
         <div className="flex flex-col gap-8">
           <DollarExchange />
           <DollarPrice />
