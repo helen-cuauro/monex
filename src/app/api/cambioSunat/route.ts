@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { MongoClient } from "mongodb";
 import axios from "axios";
-import cron from "node-cron";
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 const API_URL = "https://free.e-api.net.pe/tipo-cambio/today.json";
@@ -56,8 +55,3 @@ export async function GET() {
   }
 }
 
-// Actualiza automáticamente todos los días a las 8:00 AM
-cron.schedule("0 8 * * *", async () => {
-  console.log("⏰ Ejecutando actualización de dólar SUNAT...");
-  await GET();
-});

@@ -2,9 +2,8 @@ import "dotenv/config";
 import { MongoClient } from "mongodb";
 import axios from "axios";
 import * as cheerio from "cheerio";
-import cron from "node-cron";
 
-// Conexión a MongoDB fuera de la función GET, manteniendo la conexión activa
+// Mantiene la conexión viva entre llamadas
 let client: MongoClient;
 
 async function connectMongo() {
@@ -17,6 +16,7 @@ async function connectMongo() {
 
 export async function GET() {
   try {
+    // 1. Descarga la página
     const { data } = await axios.get("https://cuantoestaeldolar.pe/", {
       headers: {
         "User-Agent":
@@ -26,31 +26,31 @@ export async function GET() {
 
     const $ = cheerio.load(data);
 
+    // 2. Extrae nombre, precios y enlace, pero NO el logo
     const casasDeCambio = $(".ExchangeHouseItem_item_col__gudqq")
       .map((_, element) => {
-        const $element = $(element);
-        const nombre = $element.find("a img").attr("alt")?.trim();
-        const imagen = $element.find("a img").attr("src");
+        const $el = $(element);
+        const nombre = $el.find("a img").attr("alt")?.trim();
 
-        const compra = $element
+        const compra = $el
           .find(
             ".ValueCurrency_content_buy__Z9pSf .ValueCurrency_item_cost__Eb_37"
           )
           .text()
           .trim();
-        const venta = $element
+
+        const venta = $el
           .find(
             ".ValueCurrency_content_sale__fdX_P .ValueCurrency_item_cost__Eb_37"
           )
           .text()
           .trim();
 
-        const url = $element.find("a.Button_button_change__PYUxL").attr("href");
+        const url = $el.find("a.Button_button_change__PYUxL").attr("href");
 
-        if (nombre && compra && venta && imagen && url) {
+        if (nombre && compra && venta && url) {
           return {
             name: nombre,
-            logo: imagen,
             buy: parseFloat(compra),
             sell: parseFloat(venta),
             url,
@@ -60,23 +60,26 @@ export async function GET() {
       })
       .get();
 
+    // 3. Conexión a MongoDB
     const mongoClient = await connectMongo();
     const db = mongoClient.db("cambio_online");
     const collection = db.collection("exchange_services");
 
     const now = new Date();
-    for (const casa of casasDeCambio) {
-      const existingCasa = await collection.findOne({ name: casa.name });
 
-      if (existingCasa) {
-        if (existingCasa.buy !== casa.buy || existingCasa.sell !== casa.sell) {
+    // 4. Inserta o actualiza (sin tocar logos existentes)
+    for (const casa of casasDeCambio) {
+      const existente = await collection.findOne({ name: casa.name });
+
+      if (existente) {
+        // Solo actualiza precios y URL si cambiaron
+        if (existente.buy !== casa.buy || existente.sell !== casa.sell) {
           await collection.updateOne(
             { name: casa.name },
             {
               $set: {
                 buy: casa.buy,
                 sell: casa.sell,
-                logo: casa.logo,
                 url: casa.url,
                 updatedAt: now,
               },
@@ -85,7 +88,12 @@ export async function GET() {
           console.log(`✅ Actualizado: ${casa.name}`);
         }
       } else {
-        await collection.insertOne({...casa,  updatedAt: now });
+        // Nuevo: logo vacío para completar a mano
+        await collection.insertOne({
+          ...casa,
+          logo: "", // será rellenado manualmente
+          updatedAt: now,
+        });
         console.log(`✅ Insertado nuevo: ${casa.name}`);
       }
     }
@@ -99,19 +107,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error al obtener datos:", error);
-    console.error(
-      "Detalles:",
-      JSON.stringify(error, Object.getOwnPropertyNames(error))
-    );
     return new Response(JSON.stringify({ error: "Error al obtener datos" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
 }
-
-// Programar la ejecución periódica cada 1 minutos
-cron.schedule("*/1 * * * *", async () => {
-  console.log("Ejecutando actualización de casas de cambio...");
-  await GET();
-});

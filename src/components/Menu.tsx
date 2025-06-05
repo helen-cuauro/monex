@@ -17,7 +17,6 @@ const pages = [
   "Cambio online",
   "Ocoña",
   "Variación del dólar",
-  "Variación del dólar",
 ];
 
 function MenuBar() {
@@ -43,7 +42,7 @@ function MenuBar() {
           {/* Logo escritorio */}
           <Box
             component="a"
-            href="#"
+            href="/"
             sx={{
               display: { xs: "none", md: "flex" },
               alignItems: "center",
@@ -56,7 +55,7 @@ function MenuBar() {
           {/* Logo móvil */}
           <Box
             component="a"
-            href="#"
+            href="/"
             sx={{
               display: { xs: "flex", md: "none" },
               alignItems: "center",
