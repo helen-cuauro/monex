@@ -20,9 +20,14 @@ const pages = [
 ];
 
 function MenuBar() {
+  const [mounted, setMounted] = React.useState(false);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -31,6 +36,12 @@ function MenuBar() {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
+  if (!mounted) {
+    return (
+      <div style={{ height: "64px", backgroundColor: "white" }} />
+    );
+  }
 
   return (
     <AppBar position="static" sx={{ backgroundColor: "white", color: "black" }}>

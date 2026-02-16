@@ -1,7 +1,6 @@
-require('dotenv').config(); // Añade esto al inicio para cargar variables de entorno
-const { MongoClient, ServerApiVersion } = require('mongodb');
+import 'dotenv/config';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
-// Usar la variable de entorno
 const uri = process.env.MONGODB_URI;
 
 if (!uri) {
@@ -33,4 +32,4 @@ async function run() {
   }
 }
 
-run().catch(console.dir);
+run().catch(() => process.exit(1));
